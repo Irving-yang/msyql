@@ -1,0 +1,113 @@
+CentOS7.4 源码编译安装MySQL8.0
+[日期：2018-04-23]	来源：cnblogs.com/chenqs  作者：AF陈	[字体：大 中 小]
+MySQL 8 正式版 8.0.11 已发布，官方表示 MySQL 8 要比 MySQL 5.7 快 2 倍，还带来了大量的改进和更快的性能！
+
+以下为本人2018.4.23日安装过程的记录。整个过程大概需要一个小时，make && make install过程需要的时间较长。
+
+一.环境
+
+　　CentOS7.4  64位  最小化安装
+
+二.准备工作
+
+　　1.安装依赖
+
+      yum -y install wget  cmake gcc gcc-c++ ncurses  ncurses-devel  libaio-devel  openssl openssl-devel
+
+ 　　2.下载源码包
+
+      wget https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-boost-8.0.11.tar.gz      (此版本带有boost)
+
+　　3.创建mysql用户
+
+      groupadd mysql
+      useradd -r -g mysql -s /bin/false mysql
+
+ 　　4.创建安装目录和数据目录
+
+      mkdir -p /usr/local/mysql
+      mkdir -p /data/mysql
+
+三.安装MySQL8.0.11
+
+　　1.解压源码包
+
+      tar -zxf mysql-boost-8.0.11.tar.gz -C /usr/local
+
+　　2.编译&安装
+
+      cd /usr/local/mysql-8.0.11
+      cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DSYSCONFDIR=/etc -DMYSQL_TCP_PORT=3306 -DWITH_BOOST=/usr/local/mysql-8.0.11/boost 
+      make  && make install
+
+　　3.配置my.cnf文件
+
+      cat /etc/my.cnf
+      [mysqld]
+      server-id=1
+      port=3306
+      basedir=/usr/local/mysql
+      datadir=/data/mysql
+　　　 ##请根据实际情况添加参数
+
+ 　　4.目录权限修改
+
+      chown -R mysql:mysql /usr/local/mysql
+      chown -R mysql:mysql /data/mysql
+      chmod 755 /usr/local/mysql -R
+      chmod 755 /data/mysql -R
+
+　　5.初始化
+
+      bin/mysqld --initialize --user=mysql --datadir=/data/mysql/
+      bin/mysql_ssl_rsa_setup
+
+ 　　6.启动mysql
+
+      bin/mysqld_safe --user=mysql &
+
+ 　　7.修改账号密码
+
+      bin/mysql  -uroot -p
+      mysql> alter user 'root'@'localhost' identified by "123456";
+
+        mysql> show databases;
+        +--------------------+
+        | Database          |
+        +--------------------+
+        | information_schema |
+        | mysql              |
+        | performance_schema |
+        | sys                |
+        +--------------------+
+      4 rows in set (0.00 sec)
+
+　　　　##添加远程特账号
+
+　　　　mysql> create user root@'%' identified by '123456';
+　　　　Query OK, 0 rows affected (0.08 sec)
+
+　　　　mysql> grant all privileges on *.* to root@'%';
+　　　　Query OK, 0 rows affected (0.04 sec)
+
+　　　　mysql> flush privileges;
+　　　　Query OK, 0 rows affected (0.01 sec)
+
+ 　　8.创建软链接(非必要)
+
+    ln -s /usr/local/mysql/bin/* /usr/local/bin/
+
+
+　　　　mysql -h 127.0.0.1 -P 3306 -uroot -p123456 -e "select version();"
+　　　　mysql: [Warning] Using a password on the command line interface can be insecure.
+　　　　+-----------+
+　　　　| version() |
+　　　　+-----------+
+　　　　| 8.0.11    |
+　　　　+-----------+
+
+ 　　9.添加到启动(非必要)
+
+    cp support-files/mysql.server /etc/init.d/mysql.server
+
+特此说明：MySQL官方推荐使用二进制安装的方式。（下图为官方文档截图）
