@@ -1,8 +1,5 @@
 CentOS7.4 源码编译安装MySQL8.0
-[日期：2018-04-23]	来源：cnblogs.com/chenqs  作者：AF陈	[字体：大 中 小]
 MySQL 8 正式版 8.0.11 已发布，官方表示 MySQL 8 要比 MySQL 5.7 快 2 倍，还带来了大量的改进和更快的性能！
-
-以下为本人2018.4.23日安装过程的记录。整个过程大概需要一个小时，make && make install过程需要的时间较长。
 
 一.环境
 
@@ -12,21 +9,21 @@ MySQL 8 正式版 8.0.11 已发布，官方表示 MySQL 8 要比 MySQL 5.7 快 2
 
 　　1.安装依赖
 
-      yum -y install wget  cmake gcc gcc-c++ ncurses  ncurses-devel  libaio-devel  openssl openssl-devel
+    yum -y install wget  cmake gcc gcc-c++ ncurses  ncurses-devel  libaio-devel  openssl openssl-devel
 
- 　　2.下载源码包
+ 　 2.下载源码包
 
-      wget https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-boost-8.0.11.tar.gz      (此版本带有boost)
+    wget https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-boost-8.0.11.tar.gz      (此版本带有boost)
 
 　　3.创建mysql用户
 
-      groupadd mysql
-      useradd -r -g mysql -s /bin/false mysql
+    groupadd mysql
+    useradd -r -g mysql -s /bin/false mysql
 
- 　　4.创建安装目录和数据目录
+ 　 4.创建安装目录和数据目录
 
-      mkdir -p /usr/local/mysql
-      mkdir -p /data/mysql
+    mkdir -p /usr/local/mysql
+    mkdir -p /data/mysql
 
 三.安装MySQL8.0.11
 
@@ -37,7 +34,7 @@ MySQL 8 正式版 8.0.11 已发布，官方表示 MySQL 8 要比 MySQL 5.7 快 2
 　　2.编译&安装
 
       cd /usr/local/mysql-8.0.11
-      cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DSYSCONFDIR=/etc -DMYSQL_TCP_PORT=3306 -DWITH_BOOST=/usr/local/mysql-8.0.11/boost 
+      cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql -DSYSCONFDIR=/etc -DMYSQL_TCP_PORT=3306 -DWITH_BOOST=/root/mysql-8.0.11/boost 
       make  && make install
 
 　　3.配置my.cnf文件
@@ -83,7 +80,6 @@ MySQL 8 正式版 8.0.11 已发布，官方表示 MySQL 8 要比 MySQL 5.7 快 2
       4 rows in set (0.00 sec)
 
 　　　　##添加远程特账号
-
 　　　　mysql> create user root@'%' identified by '123456';
 　　　　Query OK, 0 rows affected (0.08 sec)
 
@@ -96,7 +92,6 @@ MySQL 8 正式版 8.0.11 已发布，官方表示 MySQL 8 要比 MySQL 5.7 快 2
  　　8.创建软链接(非必要)
 
     ln -s /usr/local/mysql/bin/* /usr/local/bin/
-
 
 　　　　mysql -h 127.0.0.1 -P 3306 -uroot -p123456 -e "select version();"
 　　　　mysql: [Warning] Using a password on the command line interface can be insecure.
