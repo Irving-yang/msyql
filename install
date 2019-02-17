@@ -65,7 +65,7 @@ MySQL 8 正式版 8.0.11 已发布，官方表示 MySQL 8 要比 MySQL 5.7 快 2
 
  　　7.修改账号密码
 
-      bin/mysql  -uroot -p
+      bin/mysql  -uroot -p      //秘密有可能会系统自建  记得注意
       mysql> alter user 'root'@'localhost' identified by "123456";
 
         mysql> show databases;
